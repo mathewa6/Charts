@@ -12,6 +12,11 @@ internal func accessibilityPostScreenChangedNotification(withElement element: An
     UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, element)
 }
 
+internal func accessibilityPostAnnouncementNotification(withString announcement: String)
+{
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, announcement)
+}
+
 /// A simple abstraction over UIAccessibilityElement and NSAccessibilityElement.
 open class NSUIAccessibilityElement: UIAccessibilityElement
 {
@@ -99,6 +104,19 @@ internal func accessibilityPostLayoutChangedNotification(withElement element: An
 internal func accessibilityPostScreenChangedNotification(withElement element: Any? = nil)
 {
     // Placeholder
+}
+
+internal func accessibilityPostAnnouncementNotification(withString announcement: String)
+{
+    // Placeholder
+    
+    /*
+    // This is unnecessary for now, since VO on mac automatically speaks panned elements using Trackpad Commander
+    NSAccessibilityPostNotificationWithUserInfo(NSApplication.shared.mainWindow ?? NSWindow(),
+                                                NSAccessibilityNotificationName.announcementRequested,
+                                                [NSAccessibilityNotificationUserInfoKey.announcement : announcement,
+                                                 NSAccessibilityNotificationUserInfoKey.priority : NSAccessibilityPriorityLevel.high])
+    */
 }
 
 /// A simple abstraction over UIAccessibilityElement and NSAccessibilityElement.

@@ -107,6 +107,9 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
     /// flag that indicates if offsets calculation has already been done or not
     private var _offsetsCalculated = false
     
+    /// object last announced to Accessibility clients when panning
+    internal var _lastHighlightedAccesibilityElement: NSUIAccessibilityElement?
+        
     /// array of Highlight objects that reference the highlighted slices in the chart
     internal var _indicesToHighlight = [Highlight]()
     
@@ -228,6 +231,7 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         _offsetsCalculated = false
         _indicesToHighlight.removeAll()
         lastHighlighted = nil
+        _lastHighlightedAccesibilityElement = nil
     
         setNeedsDisplay()
     }
@@ -415,10 +419,12 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         if _indicesToHighlight.isEmpty
         {
             self.lastHighlighted = nil
+            self._lastHighlightedAccesibilityElement = nil
         }
         else
         {
             self.lastHighlighted = _indicesToHighlight[0]
+            accessibilityHighlight(highlight: _indicesToHighlight[0])
         }
 
         // redraw the chart
@@ -501,6 +507,7 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         if h == nil
         {
             self.lastHighlighted = nil
+            self._lastHighlightedAccesibilityElement = nil
             _indicesToHighlight.removeAll(keepingCapacity: false)
         }
         else
@@ -518,6 +525,8 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
             }
         }
         
+        accessibilityHighlight(highlight: h)
+
         if callDelegate, let delegate = delegate
         {
             if let h = h
@@ -533,6 +542,24 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         
         // redraw the chart
         setNeedsDisplay()
+    }
+    
+    private func accessibilityHighlight(highlight: Highlight?) {
+        // TODO: Allow proper functioning for charts with more than one dataset
+        // Currently it only reads one arbitrary data set, thereby misrepresenting the chart.
+        guard let dataSetCount = data?.dataSetCount, dataSetCount <= 1 else { return }
+        
+        guard let h: Highlight = highlight else { return }
+        guard
+            let set = data?.getDataSetByIndex(h.dataSetIndex),
+            let e = data?.entryForHighlight(h)
+            else { return }
+        
+        let entryIndex = set.entryIndex(entry: e)
+        guard let element = self.accessibilityChildren()?[entryIndex + 1] as? NSUIAccessibilityElement else { return }
+        
+        accessibilityPostAnnouncementNotification(withString: element.accessibilityLabel ?? "Chart element")
+        self._lastHighlightedAccesibilityElement = element
     }
     
     /// - returns: The Highlight object (contains x-index and DataSet index) of the
