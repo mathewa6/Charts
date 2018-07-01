@@ -57,6 +57,19 @@ open class NSUIAccessibilityElement: UIAccessibilityElement
             super.accessibilityFrame = containerView.convert(newValue, to: UIScreen.main.coordinateSpace)
         }
     }
+    
+    override open var accessibilityHint: String?
+    {
+        get
+        {
+            return super.accessibilityHint
+        }
+        
+        set
+        {
+            super.accessibilityHint = newValue
+        }
+    }
 }
 
 extension NSUIView
@@ -153,6 +166,14 @@ open class NSUIAccessibilityElement: NSAccessibilityElement
         }
     }
 
+    /// **NOTE**: This does not do anything on a mac
+    open var accessibilityHint: String
+    {
+        // Placeholder
+        get { return "" }
+        set { }
+    }
+    
     open var accessibilityFrame: NSRect
     {
         get

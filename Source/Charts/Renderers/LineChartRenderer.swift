@@ -618,6 +618,8 @@ open class LineChartRenderer: LineRadarRenderer
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: lineData,
                                                  withDefaultDescription: "Line Chart")
+            element.accessibilityHint = "Double tap and hold, then drag, to skim values."
+
             accessibleChartElements.append(element)
         }
 

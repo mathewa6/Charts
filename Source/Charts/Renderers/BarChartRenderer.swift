@@ -235,6 +235,7 @@ open class BarChartRenderer: BarLineScatterCandleBubbleRenderer
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: barData,
                                                  withDefaultDescription: "Bar Chart")
+            element.accessibilityHint = "Double tap and hold, then drag, to skim values."
             accessibleChartElements.append(element)
         }
 

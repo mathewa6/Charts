@@ -767,9 +767,7 @@ open class BarLineChartViewBase: ChartViewBase, BarLineScatterCandleBubbleChartD
         {
             // When panning (on iOS), if the finger is lifted we want to focus on a known entity.
             // TODO: Fix an issue that causes using the last panned accessibilityElement to lose container hierarchy
-            // To accomodate for this bug, for now, we refocus on the entire chart view when the finger is lifted.
-            // This is because, in most cases the panning with VoiceOver implies the user is scanning the data set.
-            accessibilityPostLayoutChangedNotification(withElement: self)
+            // accessibilityPostLayoutChangedNotification(withElement: self._lastHighlightedAccesibilityElement)
 
             if _isDragging
             {

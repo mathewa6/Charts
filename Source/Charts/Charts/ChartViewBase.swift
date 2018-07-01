@@ -543,25 +543,25 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         // redraw the chart
         setNeedsDisplay()
     }
-    
-    private func accessibilityHighlight(highlight: Highlight?) {
+
+    private func accessibilityHighlight(highlight: Highlight?)
+    {
         // TODO: Allow proper functioning for charts with more than one dataset
         // Currently it only reads one arbitrary data set, thereby misrepresenting the chart.
         guard let dataSetCount = data?.dataSetCount, dataSetCount <= 1 else { return }
-        
+
         guard let h: Highlight = highlight else { return }
         guard
             let set = data?.getDataSetByIndex(h.dataSetIndex),
             let e = data?.entryForHighlight(h)
             else { return }
-        
+
         let entryIndex = set.entryIndex(entry: e)
         guard let element = self.accessibilityChildren()?[entryIndex + 1] as? NSUIAccessibilityElement else { return }
-        
         accessibilityPostAnnouncementNotification(withString: element.accessibilityLabel ?? "Chart element")
         self._lastHighlightedAccesibilityElement = element
     }
-    
+
     /// - returns: The Highlight object (contains x-index and DataSet index) of the
     /// selected value at the given touch point inside the Line-, Scatter-, or
     /// CandleStick-Chart.
