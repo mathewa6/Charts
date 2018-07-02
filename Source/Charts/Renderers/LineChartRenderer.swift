@@ -687,7 +687,7 @@ open class LineChartRenderer: LineRadarRenderer
                         element.accessibilityFrame = accessibilityRect
                     }
 
-                    accessibilityOrderedElements[i].append(element)
+                    accessibilityOrderedElements[j].append(element)
                 }
 
                 if !dataSet.isDrawCirclesEnabled
@@ -805,12 +805,10 @@ open class LineChartRenderer: LineRadarRenderer
     /// This is marked internal to support HorizontalBarChartRenderer as well.
     private func accessibilityCreateEmptyOrderedElements() -> [[NSUIAccessibilityElement]]
     {
-        guard let chart = dataProvider as? LineChartView else { return [] }
-
-        let dataSetCount = chart.lineData?.dataSetCount ?? 0
-
+        let elementCount = Array(stride(from: _xBounds.min, through: _xBounds.range + _xBounds.min, by: 1)).count
+        
         return Array(repeating: [NSUIAccessibilityElement](),
-                     count: dataSetCount)
+                     count: elementCount)
     }
 
     /// Creates an NSUIAccessibleElement representing the smallest meaningful bar of the chart

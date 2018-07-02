@@ -28,6 +28,7 @@ open class BarChartView: BarLineChartViewBase, BarChartDataProvider
         renderer = BarChartRenderer(dataProvider: self, animator: _animator, viewPortHandler: _viewPortHandler)
         
         self.highlighter = BarHighlighter(chart: self)
+        self._allowsHighlightedAccessibilityElements = true
         
         self.xAxis.spaceMin = 0.5
         self.xAxis.spaceMax = 0.5

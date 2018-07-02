@@ -109,6 +109,9 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
     
     /// object last announced to Accessibility clients when panning
     internal var _lastHighlightedAccesibilityElement: NSUIAccessibilityElement?
+    
+    /// toggles the ability to use VoiceOver panning to skim chart elements
+    internal var _allowsHighlightedAccessibilityElements: Bool = false
         
     /// array of Highlight objects that reference the highlighted slices in the chart
     internal var _indicesToHighlight = [Highlight]()
@@ -544,12 +547,14 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         setNeedsDisplay()
     }
 
-    private func accessibilityHighlight(highlight: Highlight?)
+    internal func accessibilityHighlight(highlight: Highlight?)
     {
         // TODO: Allow proper functioning for charts with more than one dataset
         // Currently it only reads one arbitrary data set, thereby misrepresenting the chart.
-        guard let dataSetCount = data?.dataSetCount, dataSetCount <= 1 else { return }
+        // guard let dataSetCount = data?.dataSetCount, dataSetCount <= 1 else { return }
 
+        guard _allowsHighlightedAccessibilityElements == true else { return }
+        
         guard let h: Highlight = highlight else { return }
         guard
             let set = data?.getDataSetByIndex(h.dataSetIndex),
@@ -557,9 +562,24 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
             else { return }
 
         let entryIndex = set.entryIndex(entry: e)
-        guard let element = self.accessibilityChildren()?[entryIndex + 1] as? NSUIAccessibilityElement else { return }
-        accessibilityPostAnnouncementNotification(withString: element.accessibilityLabel ?? "Chart element")
-        self._lastHighlightedAccesibilityElement = element
+        guard let dataSetCount = data?.dataSetCount else { return }
+        
+        var accessibilityChildrenEntryIndex: Int = -1
+        // If there are multiple datasets, account for the use of accessibilityOrderedElements in Line/Bar charts.
+        // In those cases, the indices are not ordered as they are drawn/rendered.
+        if dataSetCount <= 1 {
+            accessibilityChildrenEntryIndex = (entryIndex + 1)
+        } else {
+            accessibilityChildrenEntryIndex = ((entryIndex + 1) * dataSetCount) - (dataSetCount - (h.dataSetIndex + 1))
+        }
+        
+        // This check is mostly to ensure we don't use panning with charts such as Scatter that don't yet have accessibilityChildren
+        guard let children = self.accessibilityChildren() as? [NSUIAccessibilityElement] else { return }
+        guard accessibilityChildrenEntryIndex >= 0 && accessibilityChildrenEntryIndex < children.count else { return }
+        guard let announcement = children[accessibilityChildrenEntryIndex].accessibilityLabel  else { return }
+        
+        accessibilityPostAnnouncementNotification(withString:  announcement)
+        self._lastHighlightedAccesibilityElement = children[accessibilityChildrenEntryIndex]
     }
 
     /// - returns: The Highlight object (contains x-index and DataSet index) of the

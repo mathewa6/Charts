@@ -19,6 +19,8 @@ import CoreGraphics
 
 open class BubbleChartRenderer: BarLineScatterCandleBubbleRenderer
 {
+    // TODO: Currently, this nesting isn't necessary for BubbleCharts. However, it will make it much easier to add a custom rotor
+    // that navigates between datasets.
     /// A nested array of elements ordered logically (i.e not in visual/drawing order) for use with VoiceOver.
     private lazy var accessibilityOrderedElements: [[NSUIAccessibilityElement]] = accessibilityCreateEmptyOrderedElements()
 
