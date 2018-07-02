@@ -49,6 +49,12 @@ open class BubbleChartRenderer: BarLineScatterCandleBubbleRenderer
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: bubbleData,
                                                  withDefaultDescription: "Bubble Chart")
+
+            if chart._allowsHighlightedAccessibilityElements
+            {
+                element.accessibilityHint = "Double tap and hold, then drag, to skim values."
+            }
+
             accessibleChartElements.append(element)
         }
 
@@ -150,7 +156,7 @@ open class BubbleChartRenderer: BarLineScatterCandleBubbleRenderer
                     element.accessibilityFrame = rect
                 }
 
-                accessibilityOrderedElements[dataSetIndex].append(element)
+                accessibilityOrderedElements[j].append(element)
             }
         }
     }
@@ -324,10 +330,13 @@ open class BubbleChartRenderer: BarLineScatterCandleBubbleRenderer
     {
         guard let chart = dataProvider as? BubbleChartView else { return [] }
 
-        let dataSetCount = chart.bubbleData?.dataSetCount ?? 0
+        // NOTE: this is a workaround since the loop's stride method sometimes isn't initialized in time for use.
+        // Hence, it is used as a backup if the entry count (which is the same value) doesn't work.
+        let drawDataSetLoopCount = Array(stride(from: _xBounds.min, through: _xBounds.range + _xBounds.min, by: 1)).count
 
+        let count = chart.bubbleData?.dataSets.first?.entryCount ?? drawDataSetLoopCount
         return Array(repeating: [NSUIAccessibilityElement](),
-                     count: dataSetCount)
+                     count: count)
     }
 
     /// Creates an NSUIAccessibleElement representing individual bubbles location and relative size.

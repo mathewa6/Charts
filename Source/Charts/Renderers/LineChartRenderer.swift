@@ -695,6 +695,7 @@ open class LineChartRenderer: LineRadarRenderer
                     accessibilityOrderedElements[j].append(element)
                 }
 
+                // Ensure that accessibilityElements are populated before this check
                 if !dataSet.isDrawCirclesEnabled
                 {
                     continue

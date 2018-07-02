@@ -19,6 +19,8 @@ open class BubbleChartView: BarLineChartViewBase, BubbleChartDataProvider
         super.initialize()
         
         renderer = BubbleChartRenderer(dataProvider: self, animator: _animator, viewPortHandler: _viewPortHandler)
+
+        self._allowsHighlightedAccessibilityElements = true
     }
     
     // MARK: - BubbleChartDataProvider
