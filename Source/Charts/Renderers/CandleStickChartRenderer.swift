@@ -40,6 +40,12 @@ open class CandleStickChartRenderer: LineScatterCandleRadarRenderer
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: candleData,
                                                  withDefaultDescription: "CandleStick Chart")
+
+            if chart._allowsHighlightedAccessibilityElements
+            {
+                element.accessibilityHint = "Double tap and hold, then drag, to skim values."
+            }
+
             accessibleChartElements.append(element)
         }
 
@@ -71,7 +77,6 @@ open class CandleStickChartRenderer: LineScatterCandleRadarRenderer
         let phaseY = animator.phaseY
         let barSpace = dataSet.barSpace
         let showCandleBar = dataSet.showCandleBar
-        let entryCount = dataSet.entryCount
         
         _xBounds.set(chart: dataProvider, dataSet: dataSet, animator: animator)
         

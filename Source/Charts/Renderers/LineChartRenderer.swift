@@ -614,11 +614,16 @@ open class LineChartRenderer: LineRadarRenderer
         accessibilityOrderedElements = accessibilityCreateEmptyOrderedElements()
 
         // Make the chart header the first element in the accessible elements array
-        if let chart = dataProvider as? LineChartView {
+        if let chart = dataProvider as? LineChartView
+        {
             let element = createAccessibleHeader(usingChart: chart,
                                                  andData: lineData,
                                                  withDefaultDescription: "Line Chart")
-            element.accessibilityHint = "Double tap and hold, then drag, to skim values."
+
+            if chart._allowsHighlightedAccessibilityElements
+            {
+                element.accessibilityHint = "Double tap and hold, then drag, to skim values."
+            }
 
             accessibleChartElements.append(element)
         }

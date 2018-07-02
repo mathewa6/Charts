@@ -549,10 +549,6 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
 
     internal func accessibilityHighlight(highlight: Highlight?)
     {
-        // TODO: Allow proper functioning for charts with more than one dataset
-        // Currently it only reads one arbitrary data set, thereby misrepresenting the chart.
-        // guard let dataSetCount = data?.dataSetCount, dataSetCount <= 1 else { return }
-
         guard _allowsHighlightedAccessibilityElements == true else { return }
         
         guard let h: Highlight = highlight else { return }
@@ -565,6 +561,7 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
         guard let dataSetCount = data?.dataSetCount else { return }
         
         var accessibilityChildrenEntryIndex: Int = -1
+
         // If there are multiple datasets, account for the use of accessibilityOrderedElements in Line/Bar charts.
         // In those cases, the indices are not ordered as they are drawn/rendered.
         if dataSetCount <= 1 {
@@ -573,6 +570,19 @@ open class ChartViewBase: NSUIView, ChartDataProvider, AnimatorDelegate
             accessibilityChildrenEntryIndex = ((entryIndex + 1) * dataSetCount) - (dataSetCount - (h.dataSetIndex + 1))
         }
         
+        // If the highlight is stacked, then we can infer that the chart is using a IBarChartDataSet.
+        if h.isStacked && h.stackIndex >= 0
+        {
+            if let barSet = set as? IBarChartDataSet
+            {
+                let size = barSet.stackSize
+                let dataSetOffset = (dataSetCount - (h.dataSetIndex + 1))
+
+                // Calculate the index accounting for the use of flatMap on accessibilityOrderedElements in BarChartRenderer
+                accessibilityChildrenEntryIndex = (((entryIndex * size) + h.stackIndex + 1) * dataSetCount) - dataSetOffset
+            }
+        }
+
         // This check is mostly to ensure we don't use panning with charts such as Scatter that don't yet have accessibilityChildren
         guard let children = self.accessibilityChildren() as? [NSUIAccessibilityElement] else { return }
         guard accessibilityChildrenEntryIndex >= 0 && accessibilityChildrenEntryIndex < children.count else { return }
